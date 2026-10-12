@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: tempmail
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: tempmail
+    volumes:
+      - mail-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tempmail -d tempmail"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+  migrate:
+    build: .
+    command: ["npm", "run", "migrate"]
+    environment: &app-env
+      PGHOST: db
+      PGUSER: tempmail
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATABASE: tempmail
+      MAIL_DOMAINS: ${MAIL_DOMAINS:?Set MAIL_DOMAINS in .env}
+      MAIL_HOSTNAME: ${MAIL_HOSTNAME:?Set MAIL_HOSTNAME in .env}
+      API_KEY: ${API_KEY:?Set API_KEY in .env}
+      INBOX_TTL_SECONDS: ${INBOX_TTL_SECONDS:-3600}
+    depends_on:
+      db:
+        condition: service_healthy
+  smtp:
+    build: .
+    command: ["node", "scripts/start-smtp.js"]
+    environment: *app-env
+    ports:
+      - "${SMTP_BIND_IP:-127.0.0.1}:${SMTP_PORT:-2525}:2525"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  api:
+    build: .
+    environment:
+      <<: *app-env
+      API_HOST: 0.0.0.0
+    ports:
+      - "127.0.0.1:${API_PORT:-3000}:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  worker:
+    build: .
+    command: ["npm", "run", "worker"]
+    environment: *app-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+volumes:
+  mail-db:

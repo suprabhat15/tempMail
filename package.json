@@ -1,0 +1,36 @@
+{
+  "name": "temp-mail-haraka",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["web"],
+  "description": "Haraka receiving service and private temporary inbox API",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env --import tsx src/api.ts",
+    "smtp": "node --env-file-if-exists=.env scripts/start-smtp.js",
+    "worker": "node --env-file-if-exists=.env src/worker.js",
+    "migrate": "node --env-file-if-exists=.env scripts/migrate.js",
+    "web": "npm --workspace web run dev",
+    "build": "npm run typecheck && npm --workspace web run build",
+    "typecheck": "tsc --noEmit && npm --workspace web run typecheck",
+    "test": "node --test test/*.test.js",
+    "test:integration": "node --test test/integration.cjs"
+  },
+  "dependencies": {
+    "haraka": "3.3.4",
+    "haraka-constants": "~1.0.8",
+    "fastify": "^5.6.2",
+    "@fastify/cookie": "^11.0.2",
+    "@aws-sdk/client-s3": "^3.900.0",
+    "mailparser": "^3.9.0",
+    "pg": "^8.16.3",
+    "tsx": "^4.20.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^22.18.0",
+    "@types/pg": "^8.15.5",
+    "@playwright/test": "^1.56.0",
+    "yaml": "^2.8.1"
+  }
+}
