@@ -2,9 +2,13 @@
   "name": "temp-mail-haraka",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["web"],
+  "workspaces": [
+    "web"
+  ],
   "description": "Haraka receiving service and private temporary inbox API",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node --env-file-if-exists=.env --import tsx src/api.ts",
     "smtp": "node --env-file-if-exists=.env scripts/start-smtp.js",
@@ -17,20 +21,36 @@
     "test:integration": "node --test test/integration.cjs"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.900.0",
+    "@fastify/cookie": "^11.0.2",
+    "@prisma/composer": "0.28.0",
+    "@prisma/composer-prisma-cloud": "0.28.0",
+    "alchemy": "2.0.0-beta.78",
+    "effect": "4.0.0-rc.115",
+    "fastify": "^5.6.2",
     "haraka": "3.3.4",
     "haraka-constants": "~1.0.8",
-    "fastify": "^5.6.2",
-    "@fastify/cookie": "^11.0.2",
-    "@aws-sdk/client-s3": "^3.900.0",
     "mailparser": "^3.9.0",
     "pg": "^8.16.3",
     "tsx": "^4.20.6"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
+    "@playwright/test": "^1.56.0",
     "@types/node": "^22.18.0",
     "@types/pg": "^8.15.5",
-    "@playwright/test": "^1.56.0",
+    "prisma": "8.0.0-rc.21",
+    "typescript": "^5.9.3",
     "yaml": "^2.8.1"
+  },
+  "overrides": {
+    "@effect/platform-bun": "4.0.0-rc.115",
+    "@effect/platform-node": "4.0.0-rc.115",
+    "@effect/platform-node-shared": "4.0.0-rc.115",
+    "@effect/sql-d1": "4.0.0-rc.115",
+    "@effect/sql-mysql2": "4.0.0-rc.115",
+    "@effect/sql-pg": "4.0.0-rc.115",
+    "@effect/sql-sqlite-do": "4.0.0-rc.115",
+    "@effect/vitest": "4.0.0-rc.115",
+    "effect": "4.0.0-rc.115"
   }
 }
